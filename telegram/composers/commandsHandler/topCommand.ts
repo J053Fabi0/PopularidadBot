@@ -2,6 +2,8 @@ import { escapeHtml } from "escapeHtml";
 import db from "../../../data/database.ts";
 import { CommandContext, Context } from "grammy/mod.ts";
 
+const topEmojis = ["🥇", "🥈", "🥉"];
+
 export default async function topCommand(ctx: CommandContext<Context>) {
   const groupId = ctx.chat.id;
   const top = (
@@ -30,8 +32,13 @@ export default async function topCommand(ctx: CommandContext<Context>) {
 
   let message = `Top ${"usuarios".toQuantity(users.length)}:\n`;
   const maxLength = Math.max(...users.map((u) => u.points.toString().length));
-  for (const user of users)
-    message += `<code>${user.points.toString().padEnd(maxLength)}</code><code>  </code>${escapeHtml(user.user)}\n`;
+  for (let i = 0; i < users.length; i++) {
+    const emoji = topEmojis[i] || " ";
+    const user = users[i];
+    message +=
+      `<code>${user.points.toString().padEnd(maxLength)}</code><code>  </code>` +
+      `${escapeHtml(user.user)} ${emoji}\n`;
+  }
 
   ctx.reply(message, { parse_mode: "HTML" });
 }
