@@ -1,4 +1,5 @@
 import "humanizer/toQuantity.ts";
+import { escapeHtml } from "escapeHtml";
 import { Context, HearsContext } from "grammy/mod.ts";
 import { changePoints, getPoints } from "../data/controllers/userPointsInGroupController.ts";
 
@@ -16,10 +17,10 @@ export default async function handlePoints(ctx: HearsContext<Context>, points: n
   const groupId = ctx.chat.id;
 
   const userId = ctx.from.id;
-  const userName = ctx.from.first_name;
+  const userName = escapeHtml(ctx.from.first_name);
 
   const repliedToUserId = ctx.message.reply_to_message.from.id;
-  const repliedToUserName = ctx.message.reply_to_message.from.first_name;
+  const repliedToUserName = escapeHtml(ctx.message.reply_to_message.from.first_name);
 
   const userPoints = await getPoints(groupId, userId);
   const repliedToPoints = await changePoints(groupId, repliedToUserId, points);
