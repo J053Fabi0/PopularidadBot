@@ -1,26 +1,19 @@
 import "humanizer/toQuantity.ts";
 import { escapeHtml } from "escapeHtml";
-import { Context, HearsContext } from "grammy/mod.ts";
+import { Context, Filter, HearsContext } from "grammy/mod.ts";
 import { changePoints, getPoints } from "../data/controllers/userPointsInGroupController.ts";
 
-export default async function handlePoints(ctx: HearsContext<Context>, points: number) {
-  if (!ctx.message) return;
-  if (!ctx.message.reply_to_message) return;
-  if (!ctx.message.reply_to_message.from) return;
-  // No private chats
-  if (ctx.message.chat.type === "private") return;
-  // No points to bots
-  if (ctx.message.reply_to_message.from.is_bot) return;
-  // No points to self
-  if (ctx.message.from.id === ctx.message.reply_to_message.from.id) return;
-
+export default async function handlePoints(
+  ctx: HearsContext<Context> | Filter<Context, "message:sticker">,
+  points: number
+) {
   const groupId = ctx.chat.id;
 
-  const userId = ctx.from.id;
-  const userName = escapeHtml(ctx.from.first_name);
+  const userId = ctx.from!.id;
+  const userName = escapeHtml(ctx.from!.first_name);
 
-  const repliedToUserId = ctx.message.reply_to_message.from.id;
-  const repliedToUserName = escapeHtml(ctx.message.reply_to_message.from.first_name);
+  const repliedToUserId = ctx.message!.reply_to_message!.from!.id;
+  const repliedToUserName = escapeHtml(ctx.message!.reply_to_message!.from!.first_name);
 
   const userPoints = await getPoints(groupId, userId);
   const repliedToPoints = await changePoints(groupId, repliedToUserId, points);

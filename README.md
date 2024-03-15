@@ -8,5 +8,5 @@ Un bot para registrar la popularidad de los integrantes de un grupo. Se adquiere
 ## To do
 
 - [x] Permitir ++ y --.
-- [ ] Permitir 👍️ o un sticker con ese emoji.
+- [x] Permitir 👍️ o un sticker con ese emoji.
 - [x] Comando /set para establecer los puntos de alguien.
