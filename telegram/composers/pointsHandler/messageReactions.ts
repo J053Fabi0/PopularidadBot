@@ -21,7 +21,10 @@ export default async function messageReactions(ctx: Filter<Context, "message_rea
   if (dislikeEmojis.some((emoji) => emojiRemoved.includes(emoji))) pointsToRemove++;
 
   if (pointsToAdd !== 0)
-    await handlePoints(ctx, Math.max(-1, Math.min(1, pointsToAdd)), { byEmoji: emojiAdded[0] });
+    await handlePoints(ctx, Math.max(-1, Math.min(1, pointsToAdd)), {
+      byEmoji: emojiAdded[0],
+      replyTo: ctx.update.message_reaction.message_id,
+    });
   //
   else if (pointsToRemove !== 0) {
     const reaction = await db.messageReaction.findByPrimaryIndex("messageAndGroupId", [

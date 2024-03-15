@@ -32,10 +32,16 @@ async function getUserName(ctx: Contexts, userId: number): Promise<string | null
   return user.value.userName;
 }
 
+interface ExtraOptions {
+  sendMessage?: boolean;
+  byEmoji?: ReactionTypeEmoji["emoji"];
+  replyTo?: number;
+}
+
 export default async function handlePoints(
   ctx: Contexts,
   points: number,
-  { sendMessage = true, byEmoji }: { sendMessage?: boolean; byEmoji?: ReactionTypeEmoji["emoji"] } = {}
+  { sendMessage = true, byEmoji, replyTo }: ExtraOptions = {}
 ) {
   const groupId = ctx.update.message_reaction?.chat.id ?? ctx.chat?.id;
   if (!groupId) return;
@@ -65,7 +71,7 @@ export default async function handlePoints(
     const res = await ctx.reply(
       `<b>${userName} (${userPoints})</b> le ${points > 0 ? "aumentó" : "quitó"} ` +
         `${"punto".toQuantity(Math.abs(points))} a <b>${escapeHtml(repliedToUserName)} (${repliedToPoints})</b>.`,
-      { parse_mode: "HTML" }
+      { parse_mode: "HTML", ...(replyTo ? { reply_parameters: { message_id: replyTo } } : {}) }
     );
 
     await db.messageReaction.add({
