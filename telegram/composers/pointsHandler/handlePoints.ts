@@ -1,6 +1,7 @@
 import "humanizer/toQuantity.ts";
 import { escapeHtml } from "escapeHtml";
 import db from "../../../data/database.ts";
+import { ReactionTypeEmoji } from "grammy/types.deno.ts";
 import { Context, Filter, HearsContext } from "grammy/mod.ts";
 import { changePoints, getPoints } from "../../../data/controllers/userPointsInGroupController.ts";
 
@@ -31,7 +32,11 @@ async function getUserName(ctx: Contexts, userId: number): Promise<string | null
   return user.value.userName;
 }
 
-export default async function handlePoints(ctx: Contexts, points: number) {
+export default async function handlePoints(
+  ctx: Contexts,
+  points: number,
+  { sendMessage = true, byEmoji }: { sendMessage?: boolean; byEmoji?: ReactionTypeEmoji["emoji"] } = {}
+) {
   const groupId = ctx.update.message_reaction?.chat.id ?? ctx.chat?.id;
   if (!groupId) return;
 
@@ -56,15 +61,18 @@ export default async function handlePoints(ctx: Contexts, points: number) {
   const userPoints = await getPoints(groupId, userId);
   const repliedToPoints = await changePoints(groupId, repliedToUserId, points);
 
-  const res = await ctx.reply(
-    `<b>${userName} (${userPoints})</b> le ${points > 0 ? "aumentó" : "quitó"} ` +
-      `${"punto".toQuantity(Math.abs(points))} a <b>${escapeHtml(repliedToUserName)} (${repliedToPoints})</b>.`,
-    { parse_mode: "HTML" }
-  );
+  if (sendMessage) {
+    const res = await ctx.reply(
+      `<b>${userName} (${userPoints})</b> le ${points > 0 ? "aumentó" : "quitó"} ` +
+        `${"punto".toQuantity(Math.abs(points))} a <b>${escapeHtml(repliedToUserName)} (${repliedToPoints})</b>.`,
+      { parse_mode: "HTML" }
+    );
 
-  await db.messageReaction.add({
-    fromId: userId,
-    botReplyId: res.message_id,
-    messageAndGroupId: [repliedToMessageId, groupId],
-  });
+    await db.messageReaction.add({
+      byEmoji,
+      fromId: userId,
+      botReplyId: res.message_id,
+      messageAndGroupId: [repliedToMessageId, groupId],
+    });
+  }
 }

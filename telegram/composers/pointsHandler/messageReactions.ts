@@ -1,3 +1,5 @@
+import bot from "../../initBot.ts";
+import db from "../../../data/database.ts";
 import handlePoints from "./handlePoints.ts";
 import { Context, Filter } from "grammy/mod.ts";
 import { ReactionTypeEmoji } from "grammy/types.ts";
@@ -11,11 +13,24 @@ export default async function messageReactions(ctx: Filter<Context, "message_rea
   // this means it was a custom emoji
   if (emojiAdded.length === 0 && emojiRemoved.length === 0) return;
 
-  let points = 0;
-  if (likeEmojis.some((emoji) => emojiAdded.includes(emoji))) points++;
-  if (dislikeEmojis.some((emoji) => emojiAdded.includes(emoji))) points--;
-  if (likeEmojis.some((emoji) => emojiRemoved.includes(emoji))) points--;
-  if (dislikeEmojis.some((emoji) => emojiRemoved.includes(emoji))) points++;
+  let pointsToAdd = 0; // Positive to add, negative to remove
+  let pointsToRemove = 0; // Positive to add, negative to remove
+  if (likeEmojis.some((emoji) => emojiAdded.includes(emoji))) pointsToAdd++;
+  if (dislikeEmojis.some((emoji) => emojiAdded.includes(emoji))) pointsToAdd--;
+  if (likeEmojis.some((emoji) => emojiRemoved.includes(emoji))) pointsToRemove--;
+  if (dislikeEmojis.some((emoji) => emojiRemoved.includes(emoji))) pointsToRemove++;
 
-  if (points !== 0) await handlePoints(ctx, Math.max(-1, Math.min(1, points)));
+  if (pointsToAdd !== 0)
+    await handlePoints(ctx, Math.max(-1, Math.min(1, pointsToAdd)), { byEmoji: emojiAdded[0] });
+  //
+  else if (pointsToRemove !== 0) {
+    const reaction = await db.messageReaction.findByPrimaryIndex("messageAndGroupId", [
+      ctx.update.message_reaction.message_id,
+      ctx.update.message_reaction.chat.id,
+    ]);
+    if (!reaction || reaction.value.byEmoji !== emojiRemoved[0]) return;
+    await bot.api.deleteMessage(ctx.update.message_reaction.chat.id, reaction.value.botReplyId).catch(() => {});
+    await db.messageReaction.delete(reaction.id);
+    await handlePoints(ctx, Math.max(-1, Math.min(1, pointsToRemove)), { sendMessage: false });
+  }
 }

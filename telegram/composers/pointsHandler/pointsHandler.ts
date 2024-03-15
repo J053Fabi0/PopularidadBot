@@ -1,11 +1,11 @@
 import { Composer } from "grammy/mod.ts";
 import handlePoints from "./handlePoints.ts";
 import repliesTo from "../../filters/repliesTo.ts";
-// import messageReactions from "./messageReactions.ts";
+import messageReactions from "./messageReactions.ts";
 
 const pointsHandler = new Composer();
 
-// pointsHandler.on("message_reaction", messageReactions);
+pointsHandler.on("message_reaction", messageReactions);
 
 pointsHandler.filter(repliesTo).on("message:sticker", (ctx) => {
   const { emoji } = ctx.message.sticker;
