@@ -1,0 +1,22 @@
+{
+  "tasks": {
+    "stop": "pm2 stop popularidad",
+    "start": "pm2 start --interpreter='deno' --interpreter-args='run --unstable-kv --allow-net --allow-read --allow-env --allow-run --allow-write' --name popularidad index.ts && pm2 logs popularidad",
+    "logs": "pm2 logs popularidad",
+    "reload": "pm2 reload popularidad && pm2 logs popularidad",
+    "check": "deno check index.ts",
+    "run": "deno run --unstable-kv --allow-net --allow-read --allow-env --allow-run --allow-write index.ts",
+    "dev": "deno task watch",
+    "watch": "deno run --unstable-kv --watch --allow-net --allow-read --allow-env --allow-run --allow-write index.ts",
+    "run:molt": "deno run -A https://deno.land/x/molt/cli.ts",
+    "update_deps": "deno task -q run:molt check ./*/*.ts"
+  },
+  "imports": {
+    "escapeHtml": "https://deno.land/x/escape_html@1.0.0/mod.ts",
+    "grammy/": "https://deno.land/x/grammy@v1.21.1/",
+    "grammy-runner": "https://deno.land/x/grammy_runner@v2.0.3/mod.ts",
+    "humanizer/": "https://deno.land/x/humanizer@1.1/",
+    "kvdex": "https://deno.land/x/kvdex@0.35.2/mod.ts",
+    "std/": "https://deno.land/std@0.218.2/"
+  }
+}
