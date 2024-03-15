@@ -62,7 +62,7 @@ export default async function handlePoints(
 
   // Check if the user has already reacted to this message
   const reaction = await db.messageReaction.findByPrimaryIndex("messageAndGroupId", [repliedToMessageId, groupId]);
-  if (reaction) return;
+  if (reaction && reaction.value.fromId === userId) return;
 
   const userPoints = await getPoints(groupId, userId);
   const repliedToPoints = await changePoints(groupId, repliedToUserId, points);
