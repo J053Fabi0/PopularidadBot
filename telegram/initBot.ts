@@ -1,10 +1,10 @@
 import { Bot } from "grammy/mod.ts";
 import { BOT_TOKEN } from "../env.ts";
-import pointsHandler from "./pointsHandler.ts";
+import pointsHandler from "./composers/pointsHandler/pointsHandler.ts";
 import handleError from "../utils/handleError.ts";
 import { run, sequentialize } from "grammy-runner";
-import commandsHandler from "./commandsHandler.ts";
-import genericsHandler from "./genericsHandler.ts";
+import commandsHandler from "./composers/commandsHandler/commandsHandler.ts";
+import genericsHandler from "./composers/genericsHandler.ts";
 
 const bot = new Bot(BOT_TOKEN);
 export default bot;

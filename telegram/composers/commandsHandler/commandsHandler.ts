@@ -1,6 +1,6 @@
 import setCommand from "./setCommand.ts";
 import { Composer } from "grammy/mod.ts";
-import onlyAdmin from "./middlewares/onlyAdmin.ts";
+import onlyAdmin from "../../middlewares/onlyAdmin.ts";
 
 const commandsHandler = new Composer();
 

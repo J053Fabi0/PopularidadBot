@@ -1,11 +1,11 @@
 import { Composer } from "grammy/mod.ts";
 import handlePoints from "./handlePoints.ts";
-import repliesTo from "./filers/repliesTo.ts";
+import repliesTo from "../../filters/repliesTo.ts";
 
 const pointsHandler = new Composer();
 
 pointsHandler.filter(repliesTo).on("message:sticker", (ctx) => {
-  const emoji = ctx.message.sticker.emoji;
+  const { emoji } = ctx.message.sticker;
   if (emoji === "👍" || emoji === "👎") handlePoints(ctx, emoji === "👍" ? 1 : -1);
 });
 

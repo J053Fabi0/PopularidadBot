@@ -1,7 +1,7 @@
 import "humanizer/toQuantity.ts";
 import { escapeHtml } from "escapeHtml";
 import { CommandContext, Context } from "grammy/mod.ts";
-import { getPoints, changePoints } from "../data/controllers/userPointsInGroupController.ts";
+import { getPoints, changePoints } from "../../../data/controllers/userPointsInGroupController.ts";
 
 function wrongUssage(ctx: CommandContext<Context>) {
   ctx.reply(

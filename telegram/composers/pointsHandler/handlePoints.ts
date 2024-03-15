@@ -1,7 +1,7 @@
 import "humanizer/toQuantity.ts";
 import { escapeHtml } from "escapeHtml";
 import { Context, Filter, HearsContext } from "grammy/mod.ts";
-import { changePoints, getPoints } from "../data/controllers/userPointsInGroupController.ts";
+import { changePoints, getPoints } from "../../../data/controllers/userPointsInGroupController.ts";
 
 export default async function handlePoints(
   ctx: HearsContext<Context> | Filter<Context, "message:sticker">,
