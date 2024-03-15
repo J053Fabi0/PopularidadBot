@@ -1,4 +1,3 @@
-import "humanizer/toQuantity.ts";
 import { escapeHtml } from "escapeHtml";
 import db from "../../../data/database.ts";
 import { ReactionTypeEmoji } from "grammy/types.deno.ts";
