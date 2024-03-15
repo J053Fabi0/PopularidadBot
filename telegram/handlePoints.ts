@@ -25,7 +25,8 @@ export default async function handlePoints(ctx: HearsContext<Context>, points: n
   const repliedToPoints = await changePoints(groupId, repliedToUserId, points);
 
   await ctx.reply(
-    `${userName} (${userPoints}) le ${points > 0 ? "aumentó" : "quitó"} ` +
-      `${"punto".toQuantity(Math.abs(points))} a ${repliedToUserName} (${repliedToPoints})`
+    `<b>${userName} (${userPoints})</b> le ${points > 0 ? "aumentó" : "quitó"} ` +
+      `${"punto".toQuantity(Math.abs(points))} a <b>${repliedToUserName} (${repliedToPoints})</b>.`,
+    { parse_mode: "HTML" }
   );
 }
