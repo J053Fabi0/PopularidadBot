@@ -8,10 +8,17 @@ const likeEmojis: ReactionTypeEmoji["emoji"][] = ["👍", "🆒", "👌", "🥰"
 const dislikeEmojis: ReactionTypeEmoji["emoji"][] = ["👎", "💩", "🖕", "😡", "🤬"];
 
 export default async function messageReactions(ctx: Filter<Context, "message_reaction">) {
+  console.log("Reaction detected");
   const { emoji, emojiAdded, emojiRemoved } = ctx.reactions();
-  if (emoji.length >= 2) return;
+  if (emoji.length >= 2) {
+    console.error("More than 2 emojis detected");
+    return;
+  }
   // this means it was a custom emoji
-  if (emojiAdded.length === 0 && emojiRemoved.length === 0) return;
+  if (emojiAdded.length === 0 && emojiRemoved.length === 0) {
+    console.error("Custom emoji detected");
+    return;
+  }
 
   let pointsToAdd = 0; // Positive to add, negative to remove
   let pointsToRemove = 0; // Positive to add, negative to remove
@@ -31,7 +38,10 @@ export default async function messageReactions(ctx: Filter<Context, "message_rea
       ctx.update.message_reaction.message_id,
       ctx.update.message_reaction.chat.id,
     ]);
-    if (!reaction || reaction.value.byEmoji !== emojiRemoved[0]) return;
+    if (!reaction || reaction.value.byEmoji !== emojiRemoved[0]) {
+      console.error("Reaction not found or not the same emoji");
+      return;
+    }
     await bot.api
       .deleteMessage(ctx.update.message_reaction.chat.id, reaction.value.botReplyId)
       .catch(console.error);

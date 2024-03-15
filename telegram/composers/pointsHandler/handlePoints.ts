@@ -43,25 +43,43 @@ export default async function handlePoints(
   { sendMessage = true, byEmoji, replyTo }: ExtraOptions = {}
 ) {
   const groupId = ctx.update.message_reaction?.chat.id ?? ctx.chat?.id;
-  if (!groupId) return;
+  if (!groupId) {
+    console.error("No group id found");
+    return;
+  }
 
   const userId = ctx.from!.id;
   const userName = escapeHtml(ctx.from!.first_name);
 
   const repliedToUserId = await getUserId(ctx);
-  if (repliedToUserId === null) return;
+  if (repliedToUserId === null) {
+    console.error("No user id found");
+    return;
+  }
   const repliedToUserName = await getUserName(ctx, repliedToUserId);
-  if (repliedToUserName === null) return;
+  if (repliedToUserName === null) {
+    console.error("No user name found");
+    return;
+  }
 
   // Cannot give points to yourself
-  if (userId === repliedToUserId) return;
+  if (userId === repliedToUserId) {
+    console.error("Cannot give points to yourself");
+    return;
+  }
 
   const repliedToMessageId = ctx.message?.reply_to_message?.message_id || ctx.update.message_reaction?.message_id;
-  if (!repliedToMessageId) return;
+  if (!repliedToMessageId) {
+    console.error("No message id found");
+    return;
+  }
 
   // Check if the user has already reacted to this message
   const reaction = await db.messageReaction.findByPrimaryIndex("messageAndGroupId", [repliedToMessageId, groupId]);
-  if (reaction && reaction.value.fromId === userId) return;
+  if (reaction && reaction.value.fromId === userId) {
+    console.error("User has already reacted to this message");
+    return;
+  }
 
   const userPoints = await getPoints(groupId, userId);
   const repliedToPoints = await changePoints(groupId, repliedToUserId, points);
