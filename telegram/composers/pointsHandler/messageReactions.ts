@@ -4,7 +4,19 @@ import handlePoints from "./handlePoints.ts";
 import { Context, Filter } from "grammy/mod.ts";
 import { ReactionTypeEmoji } from "grammy/types.ts";
 
-const likeEmojis: ReactionTypeEmoji["emoji"][] = ["👍", "🆒", "👌", "🥰", "❤‍🔥", "👏", "💘", "💯", "😍", "🤩"];
+const likeEmojis: ReactionTypeEmoji["emoji"][] = [
+  "👍",
+  "🆒",
+  "👌",
+  "🥰",
+  "❤‍🔥",
+  "❤",
+  "👏",
+  "💘",
+  "💯",
+  "😍",
+  "🤩",
+];
 const dislikeEmojis: ReactionTypeEmoji["emoji"][] = ["👎", "💩", "🖕", "😡", "🤬"];
 
 export default async function messageReactions(ctx: Filter<Context, "message_reaction">) {
