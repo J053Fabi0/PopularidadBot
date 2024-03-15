@@ -4,3 +4,9 @@ Un bot para registrar la popularidad de los integrantes de un grupo. Se adquiere
 --.
 
 [@ToquinBot](https://t.me/toquinbot)
+
+## To do
+
+- [x] Permitir ++ y --.
+- [ ] Permitir 👍️ o un sticker con ese emoji.
+- [ ] Comando /set para establecer los puntos de alguien.
