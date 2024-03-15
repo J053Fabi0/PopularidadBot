@@ -3,6 +3,7 @@ import { BOT_TOKEN } from "../env.ts";
 import pointsHandler from "./pointsHandler.ts";
 import handleError from "../utils/handleError.ts";
 import { run, sequentialize } from "grammy-runner";
+import commandsHandler from "./commandsHandler.ts";
 import genericsHandler from "./genericsHandler.ts";
 
 const bot = new Bot(BOT_TOKEN);
@@ -12,6 +13,8 @@ export default bot;
 bot.use(sequentialize((ctx) => [ctx.chat?.id.toString(), ctx.from?.id.toString()].filter(Boolean) as string[]));
 
 bot.use(pointsHandler);
+bot.use(commandsHandler);
+
 bot.use(genericsHandler);
 
 bot.catch(({ ctx, error }) => {

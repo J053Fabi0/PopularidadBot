@@ -28,12 +28,14 @@ export async function changePoints(
   const primaryKey = getPrimaryKey(chatId, userId);
   const actualPoints = await getPoints(chatId, userId);
 
+  const newPoints = (isNaN(actualPoints) ? 0 : actualPoints) + points;
+
   await db.userPointsInGroup.updateByPrimaryIndex(
     "groupAndUserId",
     primaryKey,
-    { points: actualPoints + points },
+    { points: newPoints },
     { strategy: "merge-shallow" }
   );
 
-  return actualPoints + points;
+  return newPoints;
 }
