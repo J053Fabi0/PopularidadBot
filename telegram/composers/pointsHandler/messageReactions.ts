@@ -32,7 +32,9 @@ export default async function messageReactions(ctx: Filter<Context, "message_rea
       ctx.update.message_reaction.chat.id,
     ]);
     if (!reaction || reaction.value.byEmoji !== emojiRemoved[0]) return;
-    await bot.api.deleteMessage(ctx.update.message_reaction.chat.id, reaction.value.botReplyId).catch(() => {});
+    await bot.api
+      .deleteMessage(ctx.update.message_reaction.chat.id, reaction.value.botReplyId)
+      .catch(console.error);
     await db.messageReaction.delete(reaction.id);
     await handlePoints(ctx, Math.max(-1, Math.min(1, pointsToRemove)), { sendMessage: false });
   }
