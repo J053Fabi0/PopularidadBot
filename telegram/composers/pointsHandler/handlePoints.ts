@@ -43,14 +43,28 @@ export default async function handlePoints(ctx: Contexts, points: number) {
   const repliedToUserName = await getUserName(ctx, repliedToUserId);
   if (repliedToUserName === null) return;
 
+  // Cannot give points to yourself
   if (userId === repliedToUserId) return;
+
+  const repliedToMessageId = ctx.message?.reply_to_message?.message_id || ctx.update.message_reaction?.message_id;
+  if (!repliedToMessageId) return;
+
+  // Check if the user has already reacted to this message
+  const reaction = await db.messageReaction.findByPrimaryIndex("messageAndGroupId", [repliedToMessageId, groupId]);
+  if (reaction) return;
 
   const userPoints = await getPoints(groupId, userId);
   const repliedToPoints = await changePoints(groupId, repliedToUserId, points);
 
-  await ctx.reply(
+  const res = await ctx.reply(
     `<b>${userName} (${userPoints})</b> le ${points > 0 ? "aumentó" : "quitó"} ` +
       `${"punto".toQuantity(Math.abs(points))} a <b>${escapeHtml(repliedToUserName)} (${repliedToPoints})</b>.`,
     { parse_mode: "HTML" }
   );
+
+  await db.messageReaction.add({
+    fromId: userId,
+    botReplyId: res.message_id,
+    messageAndGroupId: [repliedToMessageId, groupId],
+  });
 }

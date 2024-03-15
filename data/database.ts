@@ -1,6 +1,7 @@
 import { kvdex, collection } from "kvdex";
 import UserNameModel from "./models/UserName.ts";
 import UserMessageIdModel from "./models/UserMessageId.ts";
+import MessageReactionModel from "./models/MessageReaction.ts";
 import UserPointsInGroupModel from "./models/UserPointsInGroup.ts";
 
 const kv = await Deno.openKv();
@@ -19,6 +20,11 @@ const db = kvdex(kv, {
   userName: collection(UserNameModel, {
     indices: {
       userId: "primary",
+    },
+  }),
+  messageReaction: collection(MessageReactionModel, {
+    indices: {
+      messageAndGroupId: "primary",
     },
   }),
 });
