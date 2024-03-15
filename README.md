@@ -10,3 +10,4 @@ Un bot para registrar la popularidad de los integrantes de un grupo. Se adquiere
 - [x] Permitir ++ y --.
 - [x] Permitir 👍️ o un sticker con ese emoji.
 - [x] Comando /set para establecer los puntos de alguien.
+- [ ] Reaccionar a reacciones.
