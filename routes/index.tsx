@@ -5,9 +5,9 @@ export default async function Home(a: Request) {
   const { group } = getQueryParams(a.url);
   if (group === undefined) {
     return (
-      <div class="px-4 py-8 mx-auto bg-[#86efac]">
+      <div class="px-4 py-8 mx-auto">
         <div class="max-w-screen-md mx-auto flex flex-col items-center justify-center">
-          <p>Group not found</p>
+          <h1 class="text-4xl font-bold mb-6">Grupo no encontrado</h1>
         </div>
       </div>
     );
