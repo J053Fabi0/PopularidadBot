@@ -2,6 +2,7 @@ import "std/dotenv/load.ts";
 export const BOT_TOKEN = Deno.env.get("BOT_TOKEN") as string;
 export const ADMIN_ID: number = +Deno.env.get("ADMIN_ID")!;
 export const PORT = +Deno.env.get("PORT")!;
+export const BUILDING = Boolean(Deno.env.get("BUILDING"));
 
 if (!BOT_TOKEN) {
   console.error(new Error("BOT_TOKEN must be provided!"));

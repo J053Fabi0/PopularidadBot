@@ -1,6 +1,6 @@
 {
   "tasks": {
-    "build": "deno run -A dev.ts build",
+    "build": "BUILDING=yes deno run --unstable-kv --allow-net --allow-read --allow-env --allow-run --allow-write --allow-sys=cpus dev.ts build",
     "check": "deno check main.ts dev.ts",
     "dev": "deno task watch",
     "logs": "pm2 logs popularidad",
