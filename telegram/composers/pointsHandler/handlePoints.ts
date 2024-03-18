@@ -35,12 +35,14 @@ interface ExtraOptions {
   sendMessage?: boolean;
   byEmoji?: ReactionTypeEmoji["emoji"];
   replyTo?: number;
+  /** These are the points that will show to be added or taken in the Telegram message */
+  pointsToShow?: number;
 }
 
 export default async function handlePoints(
   ctx: Contexts,
   points: number,
-  { sendMessage = true, byEmoji, replyTo }: ExtraOptions = {}
+  { sendMessage = true, byEmoji, replyTo, pointsToShow }: ExtraOptions = {}
 ) {
   const groupId = ctx.update.message_reaction?.chat.id ?? ctx.chat?.id;
   if (!groupId) return;
@@ -50,8 +52,6 @@ export default async function handlePoints(
 
   const repliedToUserId = await getUserId(ctx);
   if (repliedToUserId === null) return;
-  const repliedToUserName = await getUserName(ctx, repliedToUserId);
-  if (repliedToUserName === null) return;
 
   // Cannot give points to yourself
   if (userId === repliedToUserId) return;
@@ -63,13 +63,18 @@ export default async function handlePoints(
   const reaction = await db.messageReaction.findByPrimaryIndex("messageAndGroupId", [repliedToMessageId, groupId]);
   if (reaction && reaction.value.fromId === userId) return;
 
-  const userPoints = await getPoints(groupId, userId);
   const repliedToPoints = await changePoints(groupId, repliedToUserId, points);
 
   if (sendMessage) {
+    const repliedToUserName = await getUserName(ctx, repliedToUserId);
+    if (repliedToUserName === null) return;
+
+    const userPoints = await getPoints(groupId, userId);
+
     const res = await ctx.reply(
-      `<b>${userName} (${userPoints})</b> le ${points > 0 ? "aumentó" : "quitó"} ` +
-        `${"punto".toQuantity(Math.abs(points))} a <b>${escapeHtml(repliedToUserName)} (${repliedToPoints})</b>.`,
+      `<b>${userName} (${userPoints})</b> le ${(pointsToShow ?? points) > 0 ? "aumentó" : "quitó"} ` +
+        `${"punto".toQuantity(Math.abs(pointsToShow ?? points))} a ` +
+        `<b>${escapeHtml(repliedToUserName)} (${repliedToPoints})</b>.`,
       { parse_mode: "HTML", ...(replyTo ? { reply_parameters: { message_id: replyTo } } : {}) }
     );
 
