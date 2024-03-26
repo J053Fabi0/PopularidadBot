@@ -2,6 +2,7 @@
 
 import "preact/debug";
 import "./telegram/initBot.ts";
+import "humanizer/toQuantity.ts";
 import dev from "$fresh/dev.ts";
 import config from "./fresh.config.ts";
 

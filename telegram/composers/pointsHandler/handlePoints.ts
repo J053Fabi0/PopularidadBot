@@ -60,8 +60,12 @@ export default async function handlePoints(
   if (!repliedToMessageId) return;
 
   // Check if the user has already reacted to this message
-  const reaction = await db.messageReaction.findByPrimaryIndex("messageAndGroupId", [repliedToMessageId, groupId]);
-  if (reaction && reaction.value.fromId === userId) return;
+  const reaction = await db.messageReaction.findByPrimaryIndex("messageFromIdAndGroupId", [
+    repliedToMessageId,
+    userId,
+    groupId,
+  ]);
+  if (reaction) return;
 
   const repliedToPoints = await changePoints(groupId, repliedToUserId, points);
 
@@ -80,9 +84,8 @@ export default async function handlePoints(
 
     await db.messageReaction.add({
       byEmoji,
-      fromId: userId,
       botReplyId: res.message_id,
-      messageAndGroupId: [repliedToMessageId, groupId],
+      messageFromIdAndGroupId: [repliedToMessageId, userId, groupId],
     });
   }
 }

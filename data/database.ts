@@ -24,7 +24,7 @@ const db = kvdex(kv, {
   }),
   messageReaction: collection(MessageReactionModel, {
     indices: {
-      messageAndGroupId: "primary",
+      messageFromIdAndGroupId: "primary",
     },
   }),
 });

@@ -29,6 +29,8 @@ function getReactionPoints(reaction: Document<MessageReaction> | null): null | n
 }
 
 export default async function messageReactions(ctx: Filter<Context, "message_reaction">) {
+  if (!ctx.update.message_reaction.user) return;
+
   const { emojiAdded: emojisAdded, emojiRemoved: emojisRemoved } = ctx.reactions();
   const [emojiAdded] = emojisAdded;
   const [emojiRemoved] = emojisRemoved;
@@ -36,10 +38,12 @@ export default async function messageReactions(ctx: Filter<Context, "message_rea
   // this means it was a custom emoji
   if (!emojiAdded && !emojiRemoved) return;
 
+  const fromId = ctx.update.message_reaction.user.id;
   const groupId = ctx.update.message_reaction.chat.id;
   const repliedToMessageId = ctx.update.message_reaction.message_id;
-  const prevReaction = await db.messageReaction.findByPrimaryIndex("messageAndGroupId", [
+  const prevReaction = await db.messageReaction.findByPrimaryIndex("messageFromIdAndGroupId", [
     repliedToMessageId,
+    fromId,
     groupId,
   ]);
   const prevReactionPoints = getReactionPoints(prevReaction);
