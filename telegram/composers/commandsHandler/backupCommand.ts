@@ -11,7 +11,7 @@ export default async function setCommand(ctx: CommandContext<Context>) {
   const files: InputMediaDocument[] = [];
   for (const key of dataToBackup) {
     const values = { key, value: (await db[key].getMany()).result.map((r) => r.value) };
-    const blob = new Blob([JSON.stringify(values, null, 2)], { type: "application/json" });
+    const blob = new Blob([JSON.stringify(values)], { type: "application/json" });
     const file = new InputFile(blob, `${key}.json`);
     const media = InputMediaBuilder.document(file, { caption: `Entries: ${values.value.length}` });
     files.push(media);
