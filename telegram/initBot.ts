@@ -3,8 +3,8 @@ import handleError from "../utils/handleError.ts";
 import { API_CONSTANTS, Bot } from "grammy/mod.ts";
 import { run, sequentialize } from "grammy-runner";
 import saveMessagesInfo from "./saveMessagesInfo.ts";
-import genericsHandler from "./composers/genericsHandler.ts";
 import pointsHandler from "./composers/pointsHandler/pointsHandler.ts";
+import genericsHandler from "./composers/genericsHandler/genericsHandler.ts";
 import commandsHandler from "./composers/commandsHandler/commandsHandler.ts";
 
 const bot = new Bot(BOT_TOKEN);

@@ -16,6 +16,7 @@
   },
   "imports": {
     "lodash": "https://deno.land/x/deno_ts_lodash@0.0.1/mod.ts",
+    "axiod": "https://deno.land/x/axiod@0.26.2/mod.ts",
     "$fresh/": "https://deno.land/x/fresh@1.6.8/",
     "preact": "https://esm.sh/preact@10.19.6",
     "preact/": "https://esm.sh/preact@10.19.6/",
@@ -25,7 +26,7 @@
     "tailwindcss/": "npm:/tailwindcss@3.4.1/",
     "tailwindcss/plugin": "npm:/tailwindcss@3.4.1/plugin.js",
     "escapeHtml": "https://deno.land/x/escape_html@1.0.0/mod.ts",
-    "grammy/": "https://deno.land/x/grammy@v1.21.1/",
+    "grammy/": "https://deno.land/x/grammy@v1.22.0/",
     "grammy-runner": "https://deno.land/x/grammy_runner@v2.0.3/mod.ts",
     "humanizer/": "https://deno.land/x/humanizer@1.1/",
     "kvdex": "https://deno.land/x/kvdex@0.35.2/mod.ts",
