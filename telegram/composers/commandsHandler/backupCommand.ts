@@ -1,18 +1,21 @@
 import db from "../../../data/database.ts";
 import { ADMIN_ID } from "../../../env.ts";
-import { InputFile } from "grammy/types.ts";
-import { CommandContext, Context } from "grammy/mod.ts";
+import { InputFile, InputMediaDocument } from "grammy/types.ts";
+import { CommandContext, Context, InputMediaBuilder } from "grammy/mod.ts";
+
+export const dataToBackup = ["userPointsInGroup", "userMessageId", "userName", "messageReaction"] as const;
 
 export default async function setCommand(ctx: CommandContext<Context>) {
   if (ctx.from?.id !== ADMIN_ID) return;
 
-  const data = ["userPointsInGroup", "userMessageId", "userName", "messageReaction"] as const;
-
-  for (const key of data) {
-    const values = (await db[key].getMany()).result.map((r) => r.value);
+  const files: InputMediaDocument[] = [];
+  for (const key of dataToBackup) {
+    const values = { key, value: (await db[key].getMany()).result.map((r) => r.value) };
     const blob = new Blob([JSON.stringify(values, null, 2)], { type: "application/json" });
-    await ctx.replyWithDocument(new InputFile(blob, `${key}.json`));
+    const file = new InputFile(blob, `${key}.json`);
+    const media = InputMediaBuilder.document(file, { caption: `Entries: ${values.value.length}` });
+    files.push(media);
   }
 
-  await ctx.reply("Backup completado.");
+  await ctx.replyWithMediaGroup(files);
 }
