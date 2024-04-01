@@ -5,7 +5,7 @@ import { CommandContext, Context } from "grammy/mod.ts";
 const topEmojis = ["🥇", "🥈", "🥉"];
 
 export default async function topCommand(ctx: CommandContext<Context>) {
-  const groupId = ctx.chat.id;
+  const groupId = Math.abs(ctx.chat.id);
   const top = (
     await db.userPointsInGroup.getMany({
       filter: (user) => user.value.groupAndUserId[0] === groupId,
@@ -40,7 +40,7 @@ export default async function topCommand(ctx: CommandContext<Context>) {
       `${escapeHtml(user.user)} ${emoji}\n`;
   }
 
-  message += `\n<a href="https://toquin.josefabio.com/${Math.abs(groupId)}">Ver más</a>`;
+  message += `\n<a href="https://toquin.josefabio.com/${groupId}">Ver más</a>`;
 
   ctx.reply(message, { parse_mode: "HTML" });
 }

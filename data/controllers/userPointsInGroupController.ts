@@ -25,14 +25,13 @@ export async function changePoints(
   userId: number | string,
   points: number
 ): Promise<number> {
-  const primaryKey = getPrimaryKey(chatId, userId);
   const actualPoints = await getPoints(chatId, userId);
 
   const newPoints = (isNaN(actualPoints) ? 0 : actualPoints) + points;
 
   await db.userPointsInGroup.updateByPrimaryIndex(
     "groupAndUserId",
-    primaryKey,
+    getPrimaryKey(chatId, userId),
     { points: newPoints },
     { strategy: "merge-shallow" }
   );

@@ -2,21 +2,23 @@ import db from "../../data/database.ts";
 import { Handlers, PageProps } from "$fresh/server.ts";
 
 interface Data {
-  users?: { user: string; points: number }[];
+  users?: { user: string; id: number; points: number }[];
 }
 
 export const handler: Handlers<Data> = {
   async GET(_, ctx) {
-    const groupId = Math.abs(+ctx.params.groupId);
+    const groupId = +ctx.params.groupId;
     if (!groupId) return ctx.render();
 
     const top = (
       await db.userPointsInGroup.getMany({
-        filter: (user) => Math.abs(user.value.groupAndUserId[0]) === groupId,
+        filter: (user) => user.value.groupAndUserId[0] === groupId,
       })
     ).result
       .sort((a, b) => b.value.points - a.value.points)
       .map((u) => u.value);
+
+    if (!top.length) return ctx.render();
 
     const users = (
       await Promise.all(
@@ -25,16 +27,16 @@ export const handler: Handlers<Data> = {
 
           if (!userInGroup) return null;
 
-          return { user: userInGroup.value.userName, points: user.points };
+          return { user: userInGroup.value.userName, id: user.groupAndUserId[1], points: user.points };
         })
       )
-    ).filter((u) => u !== null) as { user: string; points: number }[];
+    ).filter((u) => u !== null) as { user: string; id: number; points: number }[];
 
     return ctx.render({ users });
   },
 };
 
-export default function Home({ data }: PageProps<Data>) {
+export default function GroupStats({ data, params }: PageProps<Data>) {
   const { users } = data || {};
 
   if (users === undefined) {
@@ -61,7 +63,9 @@ export default function Home({ data }: PageProps<Data>) {
           <tbody>
             {users.map((user, i) => (
               <tr key={i}>
-                <td class="text-right border border-slate-500 py-1 px-4">{user.user}</td>
+                <td class="text-right border border-slate-500 py-1 px-4 text-blue-300">
+                  <a href={`${params.groupId}/${user.id}`}>{user.user}</a>
+                </td>
                 <td class="text-center border border-slate-500 py-1 px-4">{user.points}</td>
               </tr>
             ))}

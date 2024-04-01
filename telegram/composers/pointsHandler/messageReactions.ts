@@ -39,7 +39,7 @@ export default async function messageReactions(ctx: Filter<Context, "message_rea
   if (!emojiAdded && !emojiRemoved) return;
 
   const fromId = ctx.update.message_reaction.user.id;
-  const groupId = ctx.update.message_reaction.chat.id;
+  const groupId = Math.abs(ctx.update.message_reaction.chat.id);
   const repliedToMessageId = ctx.update.message_reaction.message_id;
   const prevReaction = await db.messageReaction.findByPrimaryIndex("messageFromIdAndGroupId", [
     repliedToMessageId,

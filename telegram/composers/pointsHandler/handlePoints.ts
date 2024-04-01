@@ -13,7 +13,7 @@ async function getUserId(ctx: Contexts): Promise<number | null> {
 
   const userMessage = await db.userMessageId.findByPrimaryIndex("messageAndGroupId", [
     ctx.update.message_reaction.message_id,
-    ctx.update.message_reaction.chat.id,
+    Math.abs(ctx.update.message_reaction.chat.id),
   ]);
   if (!userMessage) return null;
 
@@ -44,7 +44,7 @@ export default async function handlePoints(
   points: number,
   { sendMessage = true, byEmoji, replyTo, pointsToShow }: ExtraOptions = {}
 ) {
-  const groupId = ctx.update.message_reaction?.chat.id ?? ctx.chat?.id;
+  const groupId = Math.abs(ctx.update.message_reaction?.chat.id ?? ctx.chat?.id ?? 0);
   if (!groupId) return;
 
   const userId = ctx.from!.id;
@@ -84,6 +84,7 @@ export default async function handlePoints(
 
     await db.messageReaction.add({
       byEmoji,
+      toUserId: repliedToUserId,
       botReplyId: res.message_id,
       messageFromIdAndGroupId: [repliedToMessageId, userId, groupId],
     });
