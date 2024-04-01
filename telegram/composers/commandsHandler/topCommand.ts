@@ -40,7 +40,7 @@ export default async function topCommand(ctx: CommandContext<Context>) {
       `${escapeHtml(user.user)} ${emoji}\n`;
   }
 
-  message += `\n<a href="https://toquin.josefabio.com?group=${groupId}">Ver más</a>`;
+  message += `\n<a href="https://toquin.josefabio.com/${Math.abs(groupId)}">Ver más</a>`;
 
   ctx.reply(message, { parse_mode: "HTML" });
 }

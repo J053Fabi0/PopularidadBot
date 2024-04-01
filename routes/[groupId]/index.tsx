@@ -1,9 +1,43 @@
-import db from "../data/database.ts";
-import getQueryParams from "../utils/getQueryParams.ts";
+import db from "../../data/database.ts";
+import { Handlers, PageProps } from "$fresh/server.ts";
 
-export default async function Home(a: Request) {
-  const { group } = getQueryParams(a.url);
-  if (group === undefined) {
+interface Data {
+  users?: { user: string; points: number }[];
+}
+
+export const handler: Handlers<Data> = {
+  async GET(_, ctx) {
+    const groupId = Math.abs(+ctx.params.groupId);
+    if (!groupId) return ctx.render();
+
+    const top = (
+      await db.userPointsInGroup.getMany({
+        filter: (user) => Math.abs(user.value.groupAndUserId[0]) === groupId,
+      })
+    ).result
+      .sort((a, b) => b.value.points - a.value.points)
+      .map((u) => u.value);
+
+    const users = (
+      await Promise.all(
+        top.map(async (user) => {
+          const userInGroup = await db.userName.findByPrimaryIndex("userId", user.groupAndUserId[1]);
+
+          if (!userInGroup) return null;
+
+          return { user: userInGroup.value.userName, points: user.points };
+        })
+      )
+    ).filter((u) => u !== null) as { user: string; points: number }[];
+
+    return ctx.render({ users });
+  },
+};
+
+export default function Home({ data }: PageProps<Data>) {
+  const { users } = data || {};
+
+  if (users === undefined) {
     return (
       <div class="px-4 py-8 mx-auto">
         <div class="max-w-screen-md mx-auto flex flex-col items-center justify-center">
@@ -12,26 +46,6 @@ export default async function Home(a: Request) {
       </div>
     );
   }
-
-  const top = (
-    await db.userPointsInGroup.getMany({
-      filter: (user) => user.value.groupAndUserId[0] === +group,
-    })
-  ).result
-    .sort((a, b) => b.value.points - a.value.points)
-    .map((u) => u.value);
-
-  const users = (
-    await Promise.all(
-      top.map(async (user) => {
-        const userInGroup = await db.userName.findByPrimaryIndex("userId", user.groupAndUserId[1]);
-
-        if (!userInGroup) return null;
-
-        return { user: userInGroup.value.userName, points: user.points };
-      })
-    )
-  ).filter((u) => u !== null) as { user: string; points: number }[];
 
   return (
     <div class="px-4 py-8 mx-auto">
