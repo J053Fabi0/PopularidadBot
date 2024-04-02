@@ -37,7 +37,7 @@ for (const user of (await db.userPointsInGroup.getMany()).result) {
     console.log("Found user points with negative group", user.value.groupAndUserId);
     const { ok } = await db.userPointsInGroup.update(
       user.id,
-      { groupAndUserId: [-user.value.groupAndUserId[0], user.value.groupAndUserId[1]] },
+      { groupAndUserId: [Math.abs(user.value.groupAndUserId[0]), user.value.groupAndUserId[1]] },
       { mergeOptions: { arrays: "replace" } }
     );
     if (ok === false) await db.userPointsInGroup.delete(user.id);
@@ -50,61 +50,46 @@ for (const user of (await db.userMessageId.getMany()).result)
     console.log("Found user message with negative group", user.value.messageAndGroupId);
     const { ok } = await db.userMessageId.update(
       user.id,
-      { messageAndGroupId: [user.value.messageAndGroupId[0], -user.value.messageAndGroupId[1]] },
+      { messageAndGroupId: [user.value.messageAndGroupId[0], Math.abs(user.value.messageAndGroupId[1])] },
       { mergeOptions: { arrays: "replace" } }
     );
     if (ok === false) await db.userMessageId.delete(user.id);
   }
 
 // MessageReaction
-for (const reaction of (await db.messageReaction.getMany()).result)
-  if (!reaction.value.messageFromIdAndGroupId) {
-    console.count("Found message reaction without messageFromIdAndGroupId");
-    await db.messageReaction.update(reaction.id, {
-      messageFromIdAndGroupId: [
-        // @ts-ignore a
-        reaction.value.messageAndGroupId[0],
-        // @ts-ignore a
-        reaction.value.fromId,
-        // @ts-ignore a
-        reaction.value.messageAndGroupId[1],
-      ],
-    });
-    continue;
-  }
-
-// MessageReaction
 for (const reaction of (await db.messageReaction.getMany()).result) {
-  if (!reaction.value.toUserId) {
-    const message = await db.userMessageId.findByPrimaryIndex("messageAndGroupId", [
-      reaction.value.messageFromIdAndGroupId[0],
-      reaction.value.messageFromIdAndGroupId[2],
-    ]);
-    if (!message) {
-      await db.messageReaction.delete(reaction.id);
-      continue;
-    }
-    console.log(
-      "Updating message reaction with toUserId",
-      reaction.value.messageFromIdAndGroupId,
-      message.value.userId
-    );
-    await db.messageReaction.update(reaction.id, { toUserId: message.value.userId });
-  }
-
-  if (reaction.value.messageFromIdAndGroupId[1] < 0) {
-    console.log("Found message reaction with negative group", reaction.value.messageFromIdAndGroupId);
-    const { ok } = await db.messageReaction.update(
-      reaction.id,
-      {
-        messageFromIdAndGroupId: [
+  const messageFromIdAndGroupId: [number, number, number] =
+    "fromId" in reaction.value
+      ? [
+          // @ts-ignore a
+          reaction.value.messageAndGroupId[0],
+          // @ts-ignore a
+          reaction.value.fromId as number,
+          // @ts-ignore a
+          Math.abs(reaction.value.messageAndGroupId[1]),
+        ]
+      : [
           reaction.value.messageFromIdAndGroupId[0],
-          -reaction.value.messageFromIdAndGroupId[1],
-          reaction.value.messageFromIdAndGroupId[2],
-        ],
-      },
-      { mergeOptions: { arrays: "replace" } }
-    );
-    if (ok === false) await db.messageReaction.delete(reaction.id);
-  }
+          Math.abs(reaction.value.messageFromIdAndGroupId[1]),
+          Math.abs(reaction.value.messageFromIdAndGroupId[2]),
+        ];
+
+  const toUserId =
+    reaction.value.toUserId ||
+    (
+      await db.userMessageId.findByPrimaryIndex("messageAndGroupId", [
+        messageFromIdAndGroupId[0],
+        messageFromIdAndGroupId[2],
+      ])
+    )?.value.userId;
+  console.log("Found message reaction", messageFromIdAndGroupId.length, toUserId);
+
+  await db.messageReaction.delete(reaction.id);
+  if (toUserId)
+    await db.messageReaction.add({
+      messageFromIdAndGroupId,
+      botReplyId: reaction.value.botReplyId,
+      toUserId,
+      byEmoji: reaction.value.byEmoji,
+    });
 }
