@@ -25,7 +25,12 @@ export default async function fileHandler(ctx: Filter<Context, "message:file">) 
   const obj = JSON.parse(new TextDecoder().decode(data)) as FileData;
 
   await db[obj.key].deleteMany();
-  const { ok } = await db[obj.key].addMany(obj.value);
+  const { ok } = await db[obj.key].addMany(
+    obj.value.map((v) => {
+      const { ["__id__"]: _, ...a } = v;
+      return a;
+    })
+  );
 
   await ctx.reply(`<code>${name}: ${ok}</code>`, { parse_mode: "HTML" });
 }
