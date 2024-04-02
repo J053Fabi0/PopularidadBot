@@ -57,12 +57,24 @@ for (const user of (await db.userMessageId.getMany()).result)
   }
 
 // MessageReaction
-for (const reaction of (await db.messageReaction.getMany()).result) {
+for (const reaction of (await db.messageReaction.getMany()).result)
   if (!reaction.value.messageFromIdAndGroupId) {
-    await db.messageReaction.delete(reaction.id);
+    console.count("Found message reaction without messageFromIdAndGroupId");
+    await db.messageReaction.update(reaction.id, {
+      messageFromIdAndGroupId: [
+        // @ts-ignore a
+        reaction.value.messageAndGroupId[0],
+        // @ts-ignore a
+        reaction.value.fromId,
+        // @ts-ignore a
+        reaction.value.messageAndGroupId[1],
+      ],
+    });
     continue;
   }
 
+// MessageReaction
+for (const reaction of (await db.messageReaction.getMany()).result) {
   if (!reaction.value.toUserId) {
     const message = await db.userMessageId.findByPrimaryIndex("messageAndGroupId", [
       reaction.value.messageFromIdAndGroupId[0],
