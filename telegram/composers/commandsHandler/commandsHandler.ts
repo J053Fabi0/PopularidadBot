@@ -5,6 +5,7 @@ import backupCommand from "./backupCommand.ts";
 import onlyGroups from "../../filters/onlyGroups.ts";
 import onlyAdmin from "../../middlewares/onlyAdmin.ts";
 import onlyPrivate from "../../filters/onlyPrivate.ts";
+import onlyBotAdmin from "../../filters/onlyBotAdmin.ts";
 
 const commandsHandler = new Composer();
 
@@ -16,6 +17,6 @@ commandsHandler.filter(onlyGroups).command(
 
 commandsHandler.filter(onlyGroups).command("top", topCommand);
 
-commandsHandler.filter(onlyPrivate).command("backup", backupCommand);
+commandsHandler.filter(onlyPrivate).filter(onlyBotAdmin).command("backup", backupCommand);
 
 export default commandsHandler;

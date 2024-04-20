@@ -1,13 +1,12 @@
+import bot from "../../initBot.ts";
 import db from "../../../data/database.ts";
 import { ADMIN_ID } from "../../../env.ts";
+import { InputMediaBuilder } from "grammy/mod.ts";
 import { InputFile, InputMediaDocument } from "grammy/types.ts";
-import { CommandContext, Context, InputMediaBuilder } from "grammy/mod.ts";
 
 export const dataToBackup = ["userPointsInGroup", "userMessageId", "userName", "messageReaction"] as const;
 
-export default async function setCommand(ctx: CommandContext<Context>) {
-  if (ctx.from?.id !== ADMIN_ID) return;
-
+export default async function backupCommand() {
   const files: InputMediaDocument[] = [];
   for (const key of dataToBackup) {
     const values = {
@@ -23,5 +22,5 @@ export default async function setCommand(ctx: CommandContext<Context>) {
     files.push(media);
   }
 
-  await ctx.replyWithMediaGroup(files);
+  await bot.api.sendMediaGroup(ADMIN_ID, files);
 }

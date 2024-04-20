@@ -5,6 +5,7 @@
 /// <reference no-default-lib="true" />
 /// <reference lib="dom.asynciterable" />
 
+import "./crons/crons.ts";
 import "./telegram/initBot.ts";
 import "humanizer/toQuantity.ts";
 
