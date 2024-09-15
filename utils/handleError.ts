@@ -4,18 +4,22 @@ import bot from "../telegram/initBot.ts";
 import isError from "../types/guards/isError.ts";
 import isAxiodError from "../types/guards/isAxiodError.ts";
 
-// deno-lint-ignore no-explicit-any
-export default async function handleError(e: any) {
+/**
+ * @returns If the error was handled or ignored
+ */
+export default async function handleError(e: unknown): Promise<boolean> {
   console.error("#".repeat(40));
-  for (const key of Object.getOwnPropertyNames(e)) console.error(key + ":", e[key]);
+  if (typeof e === "object" && e !== null)
+    for (const key of Object.getOwnPropertyNames(e)) console.error(key + ":", Reflect.get(e, key));
   console.error(e);
 
   // These are "Wont fix" issues
   if (isAxiodError(e)) {
-    if (e.response.status === 502) return;
-    if (e.response.statusText === "Internal Server Error") return;
+    if (e.response.status === 502) return false;
+    if (e.response.statusText === "Internal Server Error") return false;
   } else if (isError(e)) {
-    if (e.message.startsWith("error sending request for url")) return;
+    if (e.message.includes("TOPIC_CLOSED")) return false;
+    if (e.message.startsWith("error sending request for url")) return false;
     if (e.message.includes("Resource temporarily unavailable")) Deno.exit(1); // exit with error so that PM2 restarts the process
   }
 
@@ -23,8 +27,8 @@ export default async function handleError(e: any) {
     bot.api.sendMessage(ADMIN_ID, `<code>${escapeHtml(message)}</code>`, { parse_mode: "HTML" });
 
   try {
-    if ("message" in e) {
-      await sMessage(typeof e.message === "object" ? JSON.stringify(e.message) : e.message);
+    if (typeof e === "object" && e !== null && "message" in e && e.message) {
+      await sMessage(typeof e.message === "object" ? JSON.stringify(e.message) : e.message.toString());
     } else {
       await sMessage(JSON.stringify(e));
     }
@@ -32,4 +36,6 @@ export default async function handleError(e: any) {
     console.error(e);
     await bot.api.sendMessage(ADMIN_ID, "Error al enviar mensaje de Telegram.", { parse_mode: "HTML" });
   }
+
+  return true;
 }

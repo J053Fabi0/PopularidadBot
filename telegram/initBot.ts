@@ -22,10 +22,11 @@ if (!BUILDING) {
 
   bot.use(genericsHandler);
 
-  bot.catch(({ ctx, error }) => {
-    console.error(`Error while handling update ${ctx.update.update_id}:`, error);
-    ctx.reply("There was an error.");
-    handleError(error);
+  bot.catch(async ({ ctx, error }) => {
+    if (await handleError(error)) {
+      console.error(`Error while handling update ${ctx.update.update_id}:`, error);
+      ctx.reply("There was an error.");
+    }
   });
 
   run(bot, { runner: { fetch: { allowed_updates: API_CONSTANTS.ALL_UPDATE_TYPES } } });

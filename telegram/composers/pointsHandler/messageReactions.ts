@@ -5,6 +5,7 @@ import handlePoints from "./handlePoints.ts";
 import { Context, Filter } from "grammy/mod.ts";
 import { ReactionTypeEmoji } from "grammy/types.ts";
 import MessageReaction from "../../../types/messageReaction.type.ts";
+import handleError from "../../../utils/handleError.ts";
 
 const likeEmojis: ReactionTypeEmoji["emoji"][] = [
   "👍",
@@ -77,7 +78,7 @@ export default async function messageReactions(ctx: Filter<Context, "message_rea
       pointsToShow: 1,
       byEmoji: emojiAdded,
       replyTo: ctx.update.message_reaction.message_id,
-    });
+    }).catch(handleError);
   }
   // A negative reaction was added
   else if (reactionAdded === -1) {
