@@ -1,18 +1,19 @@
 {
+  "unstable": ["kv", "cron"],
   "tasks": {
-    "build": "BUILDING=yes deno run --unstable-kv --unstable-cron --allow-net --allow-read --allow-env --allow-run --allow-write --allow-sys dev.ts build",
-    "check": "deno check main.ts dev.ts",
+    "build": "BUILDING=yes deno run --allow-net --allow-read --allow-env --allow-run --allow-write --allow-sys dev.ts build",
+    "check": "deno check --allow-import main.ts dev.ts",
     "dev": "deno task watch",
     "logs": "pm2 logs popularidad",
     "reload": "deno task build && pm2 reload popularidad && pm2 logs popularidad",
     "delete": "pm2 delete popularidad",
     "run:molt": "deno run -A https://deno.land/x/molt/cli.ts",
-    "run": "deno run --unstable-kv --unstable-cron --allow-net --allow-read --allow-env --allow-run --allow-write --allow-sys main.ts",
-    "start": "deno task build && pm2 start --interpreter='deno' --interpreter-args='run --unstable-kv --unstable-cron --allow-net --allow-read --allow-env --allow-run --allow-write' --name popularidad main.ts && pm2 logs popularidad",
+    "run": "deno run --allow-net --allow-read --allow-env --allow-run --allow-write --allow-sys main.ts",
+    "start": "deno task build && pm2 start --interpreter='deno' --interpreter-args='run --allow-net --allow-read --allow-env --allow-run --allow-write' --name popularidad main.ts && pm2 logs popularidad",
     "stop": "pm2 stop popularidad",
     "update_deps": "deno task -q run:molt check ./*/*.ts",
     "update": "deno run -A -r https://fresh.deno.dev/update .",
-    "watch": "deno run --unstable-kv --unstable-cron --watch --allow-net --allow-read --allow-env --allow-run --allow-write --allow-sys dev.ts"
+    "watch": "deno run --watch --allow-net --allow-read --allow-env --allow-run --allow-write --allow-sys dev.ts"
   },
   "imports": {
     "lodash": "https://deno.land/x/deno_ts_lodash@0.0.1/mod.ts",
@@ -33,7 +34,7 @@
     "std/": "https://deno.land/std@0.220.1/"
   },
   "compilerOptions": { "jsx": "react-jsx", "jsxImportSource": "preact" },
-  "nodeModulesDir": true,
+  "nodeModulesDir": "auto",
   "lint": { "rules": { "tags": ["fresh", "recommended"] } },
   "exclude": ["**/_fresh/*"]
 }
